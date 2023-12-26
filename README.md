@@ -1,9 +1,22 @@
-This is a physiologically plausible model of human object recognition written in Python. It is based on the work done by Riesenhuber & Poggo (1999). 
+# HMAX Implementation of Object Recognition 
 
-Dependencies: 
+## About ##
 
-Testing: 
+This model categorizes a set of positive and negative test images as faces or non-faces, as inspired by Riesenhuber and Poggo's HMAX model of facial recognition in the cortex. 
 
-To test the model, edit the demo.py file to whatever test image is needed. Then run: 
+The key insight of the HMAX model is to take local maximums at the second stage of processing. This produces positional invariance; that is, it allows the model to detect a face being present at any part of a local region. 
 
-python demo.py
+## Dependencies: ##
+None
+
+## Testing: ##
+
+To observe processing at each stage of the model, edit `demo.py` to whatever test image is being examined. Then run: 
+
+`python demo.py`
+
+(./demo_image.png)
+
+To train and test the model on a full set of images, edit `classify.py` with directories of positive (face) and negative (nonface) training images and positive and negative test images. It is suggested to use a similar number of training and test images for optimal results. Then run: 
+
+`python classify.py`

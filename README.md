@@ -1,4 +1,4 @@
-# HMAX Implementation of Object Recognition 
+# Computational Face Recognition Model 
 
 ## About ##
 

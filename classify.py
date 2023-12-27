@@ -72,12 +72,12 @@ clf.fit(X, y)
 print('Testing on 20 faces...')
 directory = './train_positive/'
 results1 = [clf.predict(np.array(computeResponses(mpimg.imread(directory+filename)[:,:,1],patches)).reshape(1,-1))[0] for filename in os.listdir(directory) if filename.endswith(".jpg")]
-print(results1)
+# print(results1)
 print('Accuracy: %d/20' % (sum(results1)))
 
 # compute 20 negative test responses
 print('Testing on 20 non-faces...')
 directory = './train_negative/'
 results2 = [clf.predict(np.array(computeResponses(mpimg.imread(directory+filename)[:,:,1],patches)).reshape(1,-1))[0] for filename in os.listdir(directory) if filename.endswith(".jpg")]
-print(results2)
+# print(results2)
 print('Accuracy: %d/20' % (20-sum(results2)))

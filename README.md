@@ -20,3 +20,5 @@ To observe processing at each stage of the model, edit `demo.py` to whatever tes
 To train and test the model on a full set of images, edit `classify.py` with directories of positive (face) and negative (nonface) training images and positive and negative test images. It is suggested to use a similar number of training and test images for optimal results. Then run: 
 
 `python classify.py`
+
+The images in the project directory were from Prasun Roy's Natural Images dataset at `https://www.kaggle.com/datasets/prasunroy/natural-images` 

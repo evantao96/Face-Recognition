@@ -6,7 +6,11 @@ This model categorizes a set of positive and negative test images as faces or no
 
 The key insight of the HMAX model is to take local maximums at the second stage of processing. This produces positional invariance; that is, it allows the model to detect a face being present at any part of a local region. 
 
-## Testing: ##
+## Contributors ## 
+
+Dr. Ning Qian - Evan Tao 
+
+## Testing ##
 
 To observe processing at each stage of the model, edit `demo.py` to whatever test image is being examined. Then run: 
 

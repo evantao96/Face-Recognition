@@ -1,8 +1,13 @@
 import math
+import pymongo
+import pandas as pd
 import numpy as np
 from scipy import signal, ndimage
 from scipy.io import loadmat
 from sklearn import svm
+from sklearn import datasets
+import pickle
+import time
 import matplotlib.image as mpimg
 from sklearn.preprocessing import normalize
 import os
@@ -48,18 +53,43 @@ def computeResponses(image, patches):
 
     return(maxOutputs)
 
+def saveModelToDB(model, client, db, connection, modelName): 
+    # pickling the model
+    pickledModel = pickle.dumps(model)
+
+    # starting client
+    myClient = pymongo.MongoClient(client)
+
+    # creating db
+    myDB = myClient[db]
+
+    # creating collection
+    myConnection = myDB[connection]
+    info = myConnection.insert_one({ model_name: pickledModel, 'name': modelName, 'created_time': time.time() })
+    print(info.inserted_id, ' saved with this id successfully!')
+
+    details = {
+        'inserted_id': info.inserted_id, 
+        'model_name': model_name, 
+        'created_time': time.time()
+    }
+    
+    return details
+
+
 # load patches
+print('Loading patches...   ')
 m = loadmat('./universal_patch_set.mat')
 patches = [patch.reshape(4, 4, 4) for patch in m['patches'][0][1].T[0:100]]
 
 # compute 20 positive training responses
 print('Training on 20 faces...')
-directory = './train_positive/'
+directory = './training/train_positive/'
 X1 = [computeResponses(mpimg.imread(directory+filename)[:,:,1], patches) for filename in os.listdir(directory) if filename.endswith(".jpg")]
 
 # compute 20 negative training responses
 print('Training on 20 non-faces...')
-directory = './train_negative/'
+directory = './training/train_negative/'
 X2 = [computeResponses(mpimg.imread(directory+filename)[:,:,1], patches) for filename in os.listdir(directory) if filename.endswith(".jpg")]
 
 # classify
@@ -70,14 +100,14 @@ clf.fit(X, y)
 
 # compute 20 positive test responses
 print('Testing on 20 faces...')
-directory = './train_positive/'
+directory = './test/test_positive/'
 results1 = [clf.predict(np.array(computeResponses(mpimg.imread(directory+filename)[:,:,1],patches)).reshape(1,-1))[0] for filename in os.listdir(directory) if filename.endswith(".jpg")]
 # print(results1)
 print('Accuracy: %d/20' % (sum(results1)))
 
 # compute 20 negative test responses
 print('Testing on 20 non-faces...')
-directory = './train_negative/'
+directory = './test/test_negative/'
 results2 = [clf.predict(np.array(computeResponses(mpimg.imread(directory+filename)[:,:,1],patches)).reshape(1,-1))[0] for filename in os.listdir(directory) if filename.endswith(".jpg")]
 # print(results2)
 print('Accuracy: %d/20' % (20-sum(results2)))

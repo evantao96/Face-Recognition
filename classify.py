@@ -1,13 +1,9 @@
 import math
-import pymongo
-import pandas as pd
 import numpy as np
 from scipy import signal, ndimage
 from scipy.io import loadmat
 from sklearn import svm
-from sklearn import datasets
 import pickle
-import time
 import matplotlib.image as mpimg
 from sklearn.preprocessing import normalize
 import os
@@ -53,30 +49,6 @@ def computeResponses(image, patches):
 
     return(maxOutputs)
 
-def saveModelToDB(model, client, db, connection, modelName): 
-    # pickling the model
-    pickledModel = pickle.dumps(model)
-
-    # starting client
-    myClient = pymongo.MongoClient(client)
-
-    # creating db
-    myDB = myClient[db]
-
-    # creating collection
-    myConnection = myDB[connection]
-    info = myConnection.insert_one({ model_name: pickledModel, 'name': modelName, 'created_time': time.time() })
-    print(info.inserted_id, ' saved with this id successfully!')
-
-    details = {
-        'inserted_id': info.inserted_id, 
-        'model_name': model_name, 
-        'created_time': time.time()
-    }
-    
-    return details
-
-
 # load patches
 print('Loading patches...   ')
 m = loadmat('./universal_patch_set.mat')
@@ -97,6 +69,11 @@ X = np.concatenate((X1, X2))
 y = np.array([1]*20 + [0]*20)
 clf = svm.SVC()
 clf.fit(X, y)
+
+model_pkl_file = "clf_classifier_model.pkl"
+
+with open(model_pkl_file, 'wb') as file:
+    pickle.dump(clf, file)
 
 # compute 20 positive test responses
 print('Testing on 20 faces...')

@@ -34,12 +34,12 @@ def computeDistance(p,q):
 def computeResponses(image, patches): 
 
     # create gabor filters
-    filterSize = 9 # filter dimensions
-    filterDiv = 3.8 
-    filterSizeL = -(filterSize//2)
-    filterSizeR = filterSize//2
-
-    gabor = [normalize([[computeGabor(i, j, (k-1)*math.pi/4, filterSize, filterDiv) for i in range(filterSizeL, filterSizeR+1)] for j in range(filterSizeL, filterSizeR+1)]) for k in range(4)]
+    gabor = []
+    for filterSize in range(7, 41, 2): # filter dimensions
+        filterDiv = (filterSize//-40)+4.175
+        filterSizeL = -(filterSize//2)
+        filterSizeR = filterSize//2
+        gabor += [normalize([[computeGabor(i, j, (k-1)*math.pi/4, filterSize, filterDiv) for i in range(filterSizeL, filterSizeR+1)] for j in range(filterSizeL, filterSizeR+1)]) for k in range(4)]
 
     # convolve image and filters 
     convImage = [normalize(signal.fftconvolve(image, gabor[i], mode='same')) for i in range(4)]

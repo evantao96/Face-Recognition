@@ -6,22 +6,30 @@ from scipy import signal, ndimage
 from scipy.io import loadmat
 from sklearn.preprocessing import normalize
 
-def computeGabor(i, j, theta): 
-	stdev = 10.24 # standard deviation
-	wave = 3.6 # wavelength
-	x = i*math.cos(theta) + j*math.sin(theta)
-	y = -i*math.sin(theta) + j*math.cos(theta)
-	E = math.exp(-1*((x**2) + (y**2))/(2*stdev))*math.cos(2*math.pi*x/wave)
-	return(E)
-	
+# returns value of a gabor at position (i, j), orientation theta, filter dimensions size x size and scaling factor div
+def computeGabor(i, j, theta, size, div): 
+    wave = size*2/div # wavelength
+    variance = (wave*0.8)**2 # standard deviation 
+    gamma = 0.3 # spatial aspect ratio: 0.23 < gamma < 0.92
+
+    if sqrt(i**2+j**2) > size/2: # position is out of the receptive field
+        E = 0
+    else: # position is in the receptive field
+        x = i*math.cos(theta)-j*math.sin(theta)
+        y = i*math.sin(theta)+j*math.cos(theta)
+        E = math.exp(-1*((x**2)+(gamma**2)+(y**2))/(2*variance))*math.cos(2*math.pi*x/wave)
+    return(E)
+
 # read face
-image = mpimg.imread('./train_positive/image_0006.jpg')[:,:,1]
+image = mpimg.imread('./training/train_positive/image_0006.jpg')[:,:,1]
 
 # create gabor filters
 filterSize = 9 # filter dimensions
+filterDiv = 3.8 
 filterSizeL = -(filterSize//2)
 filterSizeR = filterSize//2
-gabor = [normalize([[computeGabor(i, j, k*math.pi/4) for i in range(filterSizeL, filterSizeR+1)] for j in range(filterSizeL, filterSizeR+1)]) for k in range(4)]
+
+gabor = [normalize([[computeGabor(i, j, (k-1)*math.pi/4, filterSize, filterDiv) for i in range(filterSizeL, filterSizeR+1)] for j in range(filterSizeL, filterSizeR+1)]) for k in range(4)]
 
 # convolve image and filters 
 convImage = [normalize(signal.fftconvolve(image, gabor[i], mode='same')) for i in range(4)]
